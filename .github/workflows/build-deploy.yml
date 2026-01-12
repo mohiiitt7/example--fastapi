@@ -54,12 +54,4 @@ jobs:
         run: |
           python -m pytest
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: success()
 
-    steps:
-      - name: Trigger Render Deploy
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
