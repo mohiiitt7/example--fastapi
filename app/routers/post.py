@@ -22,7 +22,7 @@ def create_post(
         title=post.title,
         content=post.content,
         published=post.published,
-        user_id=current_user.id   # ✅ FIXED
+        owner_id=current_user.id
     )
 
     db.add(new_post)
@@ -36,6 +36,7 @@ def create_post(
 @router.get("/", response_model=List[schemas.PostOut])
 def get_posts(
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(oauth2.get_current_user),
     search: str = "",
     limit: int = 10,
     skip: int = 0
@@ -58,7 +59,11 @@ def get_posts(
 
 # ---------------- GET SINGLE POST ----------------
 @router.get("/{id}", response_model=schemas.PostOut)
-def get_post(id: int, db: Session = Depends(get_db)):
+def get_post(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(oauth2.get_current_user)
+):
     post = (
         db.query(
             models.Post,
@@ -94,7 +99,7 @@ def delete_post(
             detail="Post not found"
         )
 
-    if post.user_id != current_user.id:   # ✅ FIXED
+    if post.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized"
@@ -120,7 +125,7 @@ def update_post(
             detail="Post not found"
         )
 
-    if post.user_id != current_user.id:   # ✅ FIXED
+    if post.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized"
