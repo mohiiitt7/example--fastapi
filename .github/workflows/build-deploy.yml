@@ -52,3 +52,11 @@ jobs:
       - name: Run Tests
         run: |
           python -m pytest
+
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: [test]
+
+    steps:
+      - name: Deploying
+        run: echo "Going to deploy some stuff"
