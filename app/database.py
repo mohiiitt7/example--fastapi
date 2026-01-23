@@ -1,19 +1,24 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from urllib.parse import quote_plus
 from .config import settings
 
-password = quote_plus(settings.database_password)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{settings.database_username}:"
-    f"{password}@"
-    f"{settings.database_hostname}:"
-    f"{settings.database_port}/"
-    f"{settings.database_name}"
-)
+if DATABASE_URL:  # Running on Railway / Production
+    engine = create_engine(DATABASE_URL)
+else:  # Running Locally
+    password = quote_plus(settings.database_password)
+    SQLALCHEMY_DATABASE_URL = (
+        f"postgresql://{settings.database_username}:"
+        f"{password}@"
+        f"{settings.database_hostname}:"
+        f"{settings.database_port}/"
+        f"{settings.database_name}"
+    )
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

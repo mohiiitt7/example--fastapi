@@ -6,7 +6,11 @@ from .config import settings  # ✅ use settings, don’t redefine it
 from fastapi.middleware.cors import CORSMiddleware
 
 
-models.Base.metadata.create_all(bind=engine)
+#models.Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def on_startup():
+    models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
