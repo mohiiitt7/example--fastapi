@@ -2,23 +2,20 @@ from fastapi import FastAPI
 from . import models
 from .database import engine
 from .routers import post, user, auth, vote
-from .config import settings  # ✅ use settings, don’t redefine it
+from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()  # ✅ create app first
 
-#models.Base.metadata.create_all(bind=engine)
 @app.on_event("startup")
 def on_startup():
     models.Base.metadata.create_all(bind=engine)
 
-
-app = FastAPI()
-
 origins = ["https://www.google.com"]
 
 app.add_middleware(
-    CORSMiddleware, # type: ignore
-    allow_origins=[origins],
+    CORSMiddleware,
+    allow_origins=origins,   # also small fix here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,6 +29,7 @@ app.include_router(vote.router)
 @app.get("/")
 def root():
     return {"message": "FastAPI JWT Auth is working 🚀!!!!"}
+
 
 # from fastapi import FastAPI, Depends, HTTPException, status
 # from sqlalchemy.orm import Session
